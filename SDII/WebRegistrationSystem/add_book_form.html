@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="static/style.css">
+    <title>Add Book</title>
+</head>
+
+<body>
+
+<h2>Add a new book</h2>
+
+<div style="text-align: center">
+{% with messages = get_flashed_messages() %} {% if messages %}
+            {% for message in messages %}
+                {{ message }}<br>
+            {% endfor %}
+         {% endif %}
+{% endwith %}
+</div>
+
+<form action="/addnewbook" method="post">
+  <label for="bookID">Book ID:</label><br>
+  <input type="text" id="bookID" name="bookID" value=""><br>
+
+  <label for="title">Book Title:</label><br>
+  <input type="text" id="title" name="title"  value=""><br>
+
+  <label for="authorFirst">Author First Name:</label><br>
+  <input type="text" id="authorFirst" name="authorFirst" value=""><br>
+
+  <label for="authorLast">Author Last Name:</label><br>
+  <input type="text" id="authorLast" name="authorLast" value=""><br>
+
+  <label for="description">Book Description:</label><br>
+  <input type="text" id="description" name="description" value=""><br>
+
+<p>Book Availability:</p>
+  <div>
+    <input type="checkbox" id="availability" name="available" value="True">
+    <label for="availability">select if book is available</label>
+  </div>
+  <div>
+    <button type="submit">Submit</button>
+  </div>
+
+</form>
+

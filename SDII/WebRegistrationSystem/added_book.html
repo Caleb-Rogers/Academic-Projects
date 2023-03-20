@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="static/style.css">
+    <title>Added Book</title>
+</head>
+<body>
+<h1>The following book has been added to library's database</h1>
+   <table id="mytable" border = 1>
+            <tr>
+                <td>Book ID</td>
+                <td> {{ book }} </td>
+            </tr>
+            <tr>
+                <td>Book Title</td>
+                <td> {{ title }} </td>
+            </tr>
+            <tr>
+                <td>Author's First Name</td>
+                <td> {{ authorFN }} </td>
+            </tr>
+            <tr>
+                <td>Author's Last Name</td>
+                <td> {{ authorLN }} </td>
+            </tr>
+            <tr>
+                <td>Book Description</td>
+                <td> {{ desc }} </td>
+            </tr>
+	    <tr>
+                <td>Book Availability</td>
+                <td> {{ aval }} </td>
+            </tr>
+   </table>
+
+</body>
+</html>

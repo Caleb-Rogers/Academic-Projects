@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="static/style.css">
+    <title>User List</title>
+</head>
+<body>
+<h1>User List</h1>
+   <table id="mytable" border = 1>
+            <tr>
+                <th>Login Name </th>
+                <th>User First Name</th>
+                <th>User Last Name</th>
+                <th>User Email</th>
+
+            </tr>
+         {% for user in user_list %}
+            <tr>
+                <td> {{ user[0] }} </td>
+                <td> {{ user[1] }} </td>
+                <td> {{ user[2] }} </td>
+                <td> {{ user[3] }} </td>
+
+            </tr>
+         {% endfor %}
+   </table>
+
+</body>
+</html>

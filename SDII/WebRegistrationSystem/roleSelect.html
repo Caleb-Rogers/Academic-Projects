@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="static/style.css">
+    <title>Registrar</title>
+
+    <style>
+        h4 {
+            margin: center;
+            text-align: center;
+        }
+        a {
+            margin: center;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+<h2>Library Loan Registration System</h2>
+<h3>Who is logging on?</h3>
+
+<div style="text-align: center">
+{% with messages = get_flashed_messages() %} {% if messages %}
+            {% for message in messages %}
+                {{ message }}<br>
+            {% endfor %}
+         {% endif %}
+{% endwith %}
+</div>
+
+<h4><a href="/userlogin">User Login</a></h4>
+<h4><a href="/adminlogin">Administrator Login</a></h4>
+
+
+</body>
+</html>

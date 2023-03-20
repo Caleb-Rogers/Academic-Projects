@@ -1,0 +1,36 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="static/style.css">
+    <title>Registrar</title>
+
+    <style>
+        form {
+            margin: center;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Administrator Login</h2>
+
+<div style="text-align: center">
+{% with messages = get_flashed_messages() %} {% if messages %}
+            {% for message in messages %}
+                {{ message }}<br>
+            {% endfor %}
+         {% endif %}
+{% endwith %}
+</div>
+
+<form action="http://libloan.pythonanywhere.com/adminlogin" method="post">
+  <label for="loginname">login name:</label><br>
+  <input type="text" id="login" name="loginname" value=""><br>
+  <label for="password">login password:</label><br>
+  <input type="password" id="password" name="loginpassword" value="" placeholder="adminpassword"><br><br>
+  <input type="submit" value="Submit">
+</form>
+
+</body>
+</html>

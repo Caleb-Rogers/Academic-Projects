@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="static/style.css">
+    <title>New User</title>
+</head>
+
+<body>
+
+<h2>Add a new user</h2>
+
+<div style="text-align: center">
+{% with messages = get_flashed_messages() %} {% if messages %}
+            {% for message in messages %}
+                {{ message }}<br>
+            {% endfor %}
+         {% endif %}
+{% endwith %}
+</div>
+
+<form action="/addnewuser" method="post">
+    <label for="loginName">Login Name:</label><br>
+    <input type="text" id="loginName" name="loginName" value=""><br>
+
+    <label for="userFirst">User's First Name:</label><br>
+    <input type="text" id="userFirst" name="userFirst" value=""><br>
+
+    <label for="userLast">User's Last Name:</label><br>
+    <input type="text" id="userLast" name="userLast" value=""><br>
+
+    <label for="email">User's Email:</label><br>
+    <input type="text" id="email" name="email" value=""><br>
+
+    <input type="submit" value="Add User">
+</form>
+
+</body>
+</html>

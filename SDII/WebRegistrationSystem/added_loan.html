@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="static/style.css">
+    <title>Added Loan</title>
+</head>
+<body>
+<h1>The following loan has been added to library's database</h1>
+   <table id="mytable" border = 1>
+            <tr>
+                <td>Book ID</td>
+                <td> {{ book }} </td>
+            </tr>
+            <tr>
+                <td>Login Name</td>
+                <td> {{ loginname }} </td>
+            </tr>
+            <tr>
+                <td>Loan Checkout</td>
+                <td> {{ todaysDate }} </td>
+            </tr>
+            <tr>
+                <td>Loan Expiration</td>
+                <td> {{ expireDate }} </td>
+            </tr>
+
+   </table>
+
+</body>
+</html>

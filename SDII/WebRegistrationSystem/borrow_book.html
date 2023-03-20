@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="static/style.css">
+    <title>Book List</title>
+
+    <style>
+        form {
+            margin: center;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<h1>Enter the book id that you want to borrow </h1>
+   <table id="mytable" border = 1>
+            <tr>
+                <th>Book ID </th>
+                <th>Book Title</th>
+                <th>Author First Name</th>
+                <th>Author Last Name</th>
+                <th>Book Description</th>
+		<th>Book Availability</th>
+            </tr>
+         {% for book in book_list %}
+            <tr>
+                <td> {{ book[0] }} </td>
+                <td> {{ book[1] }} </td>
+                <td> {{ book[2] }} </td>
+                <td> {{ book[3] }} </td>
+                <td> {{ book[4] }} </td>
+		        <td> {{ book[5] }} </td>
+            </tr>
+         {% endfor %}
+   </table>
+
+    <form action="/checkavailable" method="post">
+
+        <input type="text" id="search" name="bookid"
+            placeholder="Enter Book ID..."
+            aria-label="Search through site content">
+        <button>Borrow</button>
+    </form>
+
+<div style="text-align: center">
+{% with messages = get_flashed_messages() %} {% if messages %}
+            {% for message in messages %}
+                {{ message }}<br>
+            {% endfor %}
+         {% endif %}
+{% endwith %}
+</div>
+
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="static/style.css">
+    <title>New User</title>
+
+    <style>
+        form {
+            margin: center;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Search for books using the author's last name</h2>
+
+<form action="/findbook" method="post">
+  <input type="search" id="query" name="authorname"
+   placeholder="Search..."
+   aria-label="Search through site content">
+  <button>Search</button>
+</form>
+
+</body>
+</html>
