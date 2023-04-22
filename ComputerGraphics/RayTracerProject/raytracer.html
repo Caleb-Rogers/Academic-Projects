@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title>Computer Graphics Lab - Alpha Compositing</title>
+  <meta charset="utf-8" />
+  <style>
+    html {
+      text-align: center;
+      font-family: sans-serif;
+      font-size: 200%;
+      background-color: #999;
+    }
+
+    output {
+      margin: 0;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin-right: -50%;
+      transform: translate(-50%, -50%);
+    }
+
+    canvas,
+    input {
+      display: block;
+      margin: auto;
+    }
+
+    canvas {
+      outline: 1px solid gray;
+    }
+
+    input {
+      width: 720px;
+      margin-top: 1em;
+    }
+
+    output {
+      display: block;
+    }
+
+    #spinner {
+      display: inline;
+    }
+
+    #scene {
+      display: none;
+      image-rendering: crisp-edges;
+      image-rendering: pixelated;
+    }
+  </style>
+  <script type="module">
+    import {
+      degreesToRadians
+    } from "./genmath.js";
+    import {
+      Group,
+      Sphere,
+      Plane
+    } from "./surface.js";
+    import {
+      LinearPerspectiveCamera
+    } from "./camera.js";
+    import {
+      UnLight, PointLight, LightGroup, AmbientLight
+    } from "./light.js";
+    import {
+      Renderer
+    } from "./renderer.js";
+    import {
+      LambertianMaterial, BlinnPhongMaterial, ReflectiveBlinnPhongMaterial
+    } from "./material.js";
+
+
+    // simple definition for a linear-perspective viewer
+    const camera = new LinearPerspectiveCamera(
+        // eye/camera position
+        [0, 1.2, 5],
+        // reference point
+        [0, 0.5, -1],
+        // up vector
+        [0, 1, 0],
+        // field-of-view
+        60,
+        // distance to the image/view plane
+        1,
+        // far distance
+        100
+      );
+
+    /**
+     * Preset Materials
+     * ReflectiveBlinnPhongMaterial([RGB + transparent], specular, shininess, reflection)
+     */
+    const red_solid_material = new ReflectiveBlinnPhongMaterial([1.33, 0.2, 0.2, 1], [0.8, 0.8, 0.8], 33, 0);
+    const green_solid_material = new ReflectiveBlinnPhongMaterial([0.2, 1.33, 0.2, 1], [0.8, 0.8, 0.8], 33, 0);
+    const blue_solid_material = new ReflectiveBlinnPhongMaterial([0.2, 0.2, 1.33, 1], [0.8, 0.8, 0.8], 33, 0);
+    const red_trans_material = new ReflectiveBlinnPhongMaterial([1.33, 0.2, 0.2, .40], [0.8, 0.8, 0.8], 33, 0);
+    const green_trans_material = new ReflectiveBlinnPhongMaterial([0.2, 1.33, 0.2, .40], [0.8, 0.8, 0.8], 33, 0);
+    const blue_trans_material = new ReflectiveBlinnPhongMaterial([0.2, 0.2, 1.33, .40], [0.8, 0.8, 0.8], 33, 0);
+    const translucent_material  = new ReflectiveBlinnPhongMaterial([0.1, 0.1, 0.15, 2], [0.33, 0.33, 0.33], 15000, [0.15, 0.15, 0.15]);
+
+
+
+    /**
+     * Adding Objects
+     */
+    const action = new Group();
+
+
+    function addSphere(event) {
+      action.addSurface(new Sphere([0, .5, 0], 0.5, blue_solid_material));
+      updateObjsDropdown();
+      updateSliders();
+      showScrollerValues();
+      logMsg.textContent = "A new sphere has been added";
+      window.onload();
+      event.preventDefault();
+    }
+    const addSphereButton = document.getElementById('addSphere');
+    let logMsg = document.getElementById('logMsg');
+    addSphereButton.addEventListener('click', addSphere);
+
+
+    function addPlane(event) {
+      action.addSurface(new Plane([0, 0, 0], [0, 1, 0], translucent_material));
+      updateObjsDropdown();
+      updateSliders(); 
+      showScrollerValues();
+      logMsg.textContent = "A new plane has been added";
+      window.onload();
+      event.preventDefault();
+    }
+    const addPlaneButton = document.getElementById('addPlane');
+    logMsg = document.getElementById('logMsg');
+    addPlaneButton.addEventListener('click', addPlane);
+
+
+    /**
+     * Obj dropdown list to select objects
+     */
+    function updateObjsDropdown(event) {
+      const objDropdown = document.getElementById('objects');
+
+      // Clear Dropdown
+      for (var i=0; i < action.surfaces.length; i++) {
+        objDropdown.remove(objDropdown.i);
+      }
+
+      // Create and append the options
+      for (var i=0; i < action.surfaces.length; i++) {
+        var option = document.createElement("option");
+        option.value = i;
+
+        if (action.surfaces[i] instanceof Sphere) {
+          option.text = ("Sphere  #" + (i+1));
+        }
+        else if (action.surfaces[i] instanceof Plane) {
+          option.text = ("Plane  #" + (i+1));
+        }
+        else {
+          option.text = ("Object  #" + (i+1));
+        }
+        objDropdown.appendChild(option);
+      }
+    }
+
+
+    /**
+     * Edit objects upon submit
+     */
+    function editXYZ(event) {
+      var selectedObj = document.getElementById('objects').value;
+
+      var x_axis = document.getElementById('x_axis').value;
+      var y_axis = document.getElementById('y_axis').value;
+      var z_axis = document.getElementById('z_axis').value;
+      var radius = document.getElementById('radius').value; 
+      var material = document.getElementById('material').value;
+
+      if (material == "red_solid") {
+        action.surfaces[selectedObj].material = red_solid_material;
+      }
+      else if (material == "green_solid") {
+        action.surfaces[selectedObj].material = green_solid_material;
+      }
+      else if (material == "blue_solid") {
+        action.surfaces[selectedObj].material = blue_solid_material;
+      }
+      else if (material == "red_trans") {
+        action.surfaces[selectedObj].material = red_trans_material;
+      }
+      else if (material == "green_trans") {
+        action.surfaces[selectedObj].material = blue_trans_material;
+      }
+      else if (material == "blue_trans") {
+        action.surfaces[selectedObj].material = red_solid_material;
+      }
+      else if (material == "translucent") {
+        action.surfaces[selectedObj].material = translucent_material
+      }
+
+      if (action.surfaces[selectedObj] instanceof Sphere) {
+        action.surfaces[selectedObj].center = [parseFloat(x_axis), parseFloat(y_axis), parseFloat(z_axis)];
+        action.surfaces[selectedObj].radius = radius;
+        logMsg.textContent = "Your sphere was successfully updated";
+      }
+      else if (action.surfaces[selectedObj] instanceof Plane) {
+        action.surfaces[selectedObj].n = [parseFloat(x_axis), parseFloat(y_axis), parseFloat(z_axis)];
+        action.surfaces[selectedObj].p0_dot_n = radius;
+        logMsg.textContent = "Your plane was successfully updated";
+      }
+      else {
+        logMsg.textContent = "Your object was successfully updated";
+      }
+
+      window.onload();
+      event.preventDefault();
+    }
+    const editObjForm = document.getElementById('editObj');
+    //var objDropdown = document.getElementById('objects');
+    logMsg = document.getElementById('logMsg');
+    editObjForm.addEventListener('submit', editXYZ);
+
+
+    /**
+     * Update sliders upon selected objects
+     */
+    function updateSliders(event) {
+      var selectedObj = document.getElementById('objects').value;
+
+      var x_axis = document.getElementById('x_axis');
+      var y_axis = document.getElementById('y_axis');
+      var z_axis = document.getElementById('z_axis');
+      var radius = document.getElementById('radius');
+      var material = document.getElementById('material');
+
+      if (action.surfaces[selectedObj] instanceof Sphere) {
+        x_axis.value = action.surfaces[selectedObj].center[0];
+        y_axis.value = action.surfaces[selectedObj].center[1];
+        z_axis.value = action.surfaces[selectedObj].center[2];
+        radius.value = action.surfaces[selectedObj].radius;
+        material.value = action.surfaces[selectedObj].material;
+        showScrollerValues();
+        logMsg.textContent = "Sphere #" + (parseInt(selectedObj)+1) + " was selected";
+      }
+      else if (action.surfaces[selectedObj] instanceof Plane) {
+        x_axis.value = action.surfaces[selectedObj].n[0];
+        y_axis.value = action.surfaces[selectedObj].n[1];
+        z_axis.value = action.surfaces[selectedObj].n[2];
+        radius.value = action.surfaces[selectedObj].p0_dot_n;
+        material.value = action.surfaces[selectedObj].material;
+        showScrollerValues();
+        logMsg.textContent = "Plane #" + (parseInt(selectedObj)+1) + " was selected";
+      }
+      else {
+        showScrollerValues();
+        logMsg.textContent = "Object #" + (parseInt(selectedObj)+1) + " was selected";
+      }
+      window.onload();
+    }
+    var objDropdown = document.getElementById('objects');
+    logMsg = document.getElementById('logMsg');
+    objDropdown.addEventListener('change', updateSliders);
+
+
+
+    /**
+     * Update scroller values upon slider change
+     */
+    function showScrollerValues(event) {
+      document.getElementById('show_X').innerText = document.getElementById('x_axis').value;
+      document.getElementById('show_Y').innerText = document.getElementById('y_axis').value;
+      document.getElementById('show_Z').innerText = document.getElementById('z_axis').value;
+      logMsg.textContent = "Edit Values Were Adjusted";
+      window.onload();
+    }
+    var scrollerValues = document.getElementById('editObj');
+    scrollerValues.addEventListener('change', showScrollerValues);
+
+
+    /**
+     * Change Materials
+     */
+    function modifyMaterial(event) {
+
+    }
+    var objDropdown = document.getElementById('objects');
+    logMsg = document.getElementById('logMsg');
+    objDropdown.addEventListener('change', updateSliders);
+
+
+
+
+    /* Renders a ray-traced scene into a hidden buffer (the canvas) and then displays as an image. */
+    window.onload = () => {
+      document.getElementById("scene").style.display = "none";
+      document.getElementById("spinner").style.display = "block";
+
+      // for benchmarking
+      const startTime = new Date();
+
+      
+      const lights = new PointLight([-1, 1, 2], [.5,.5,.7], [1, 1, 1]);
+      
+
+      const renderer = new Renderer(lights, camera, action);
+      renderer.addLight(new PointLight([3, 1, 1], [0.7, 0.6, 0.4]));
+      renderer.addLight(new PointLight([-2, 5, 3], [0.9, 1, 1]));
+      renderer.addLight(new AmbientLight([0.1, 0.1, 0.05]));
+
+
+      const viewport = document.getElementById("viewport");
+
+
+      renderer.render(viewport);
+
+      // save canvas image as data url (png format by default)
+      // set canvasImg image src to dataURL
+      // so it can be saved as an image
+      document.getElementById("scene").src = viewport.toDataURL();
+      document.getElementById("scene").style.display = "inline";
+      document.getElementById("spinner").style.display = "none";
+    }
+  </script>
+</head>
+
+<body>
+
+  <output>
+    <img id="spinner" src="loading-spinner.gif" alt="loading..." />
+    <img id="scene" src="" alt="render output" width="1280" height="720" />
+    <p></p>
+
+    <button id="addSphere">Add a Sphere</button>
+    <button id="addPlane">Add a Plane</button>
+    <p></p>
+
+
+    <label for="objects">Pick object to edit:</label>
+    <select id="objects" name="objects" style="width: 150px;"></select>
+
+
+    <form id="editObj">
+      <label>X-axis: <span id="show_X"></span> <input id="x_axis" type="range" min="-4" max="4" value="0" step="0.25"></label>
+      <label>Y-axis: <span id="show_Y"></span> <input id="y_axis" type="range" min="-4" max="4" value="0" step="0.25"></label>
+      <label>Z-axis: <span id="show_Z"></span> <input id="z_axis" type="range" min="-4" max="4" value="0" step="0.25"></label>
+      <label>Radius: </label> <input id="radius" type="text" style="text-align:center;"></label>
+      <label for="material">Pick material to modify:</label>
+      <select id="material" name="material" style="width: 150px;">
+        <option id="red_solid" value="red_solid">Red - Solid</option>
+        <option id="green_solid" value="green_solid">Green - Solid</option>
+        <option id="blue_solid" value="blue_solid">Blue - Solid</option>
+        <option id="red_trans" value="red_trans">Red - Transparent</option>
+        <option id="green_trans" value="green_trans">Green - Transparent</option>
+        <option id="blue_trans" value="blue_trans">Blue - Transparent</option>
+        <option id="translucent" value="translucent">Gray/Blue - Translucent</option>
+      </select>
+      <br>
+      <button type="submit">Update Object</button>
+    </form>
+    <p id="logMsg"></p>
+    
+  </output>
+      
+  <canvas id="viewport" width="700" height="420" style="display: none;">
+    Your browser does not support HTML5! Upgrade now, you neanderthal!
+  </canvas>
+
+</body></html>

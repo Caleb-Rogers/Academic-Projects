@@ -21,4 +21,4 @@ Instructions:
 
 ###
 
-![image info](./readme-img.png)
+![Operating Systems README image](./readme-img.png)
