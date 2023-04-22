@@ -1,0 +1,229 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+   <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+   <meta name="author"             content="Alan G. Labouseur" />
+   <link rel="stylesheet" href="tsos.css" type="text/css" media="screen" />
+   <title>
+      TSOS - a browser-based virtual Operating System in TypeScript
+   </title>
+
+   <!-- Globals CONSTANTS and _Variables. Must included be first. -->
+   <script type="text/javascript" src="distrib/globals.js"></script>
+
+   <!-- Host (Virtual Machine / Hardware Simulation) Routines -->
+   <script type="text/javascript" src="distrib/host/control.js"></script>
+   <script type="text/javascript" src="distrib/host/devices.js"></script>
+   <script type="text/javascript" src="distrib/host/cpu.js"></script>
+   <script type="text/javascript" src="distrib/host/memory.js"></script>
+   <script type="text/javascript" src="distrib/host/memoryAccessor.js"></script>
+
+
+   <!-- Virtual OS Routines: Make sure Kernel code is last, since it needs those above it. -->
+   <script type="text/javascript" src="distrib/os/interrupt.js"></script>
+   <script type="text/javascript" src="distrib/os/canvastext.js"></script>
+   <script type="text/javascript" src="distrib/os/console.js"></script>
+   <script type="text/javascript" src="distrib/os/deviceDriver.js"></script>
+   <script type="text/javascript" src="distrib/os/deviceDriverKeyboard.js"></script>
+   <script type="text/javascript" src="distrib/os/queue.js"></script>
+   <script type="text/javascript" src="distrib/os/shell.js"></script>
+   <script type="text/javascript" src="distrib/os/shellCommand.js"></script>
+   <script type="text/javascript" src="distrib/os/userCommand.js"></script>
+   <script type="text/javascript" src="distrib/os/kernel.js"></script>
+   <script type="text/javascript" src="distrib/os/memoryManager.js"></script>
+   <script type="text/javascript" src="distrib/os/processControlBlock.js"></script>
+   <script type="text/javascript" src="distrib/os/scheduler.js"></script>
+
+   <!-- Other Routines -->
+   <script type="text/javascript" src="distrib/utils.js"></script>
+   <!-- Uncomment the line below to enable GLaDOS testing. -->
+   <!-- <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip3.js"></script> -->
+   
+</head>
+
+<body id="backdrop" onload="onDocumentLoad()">
+
+<div id="divMain" style="width:100%;">
+
+   <div id="hostHeader">
+      <h3>
+         Date: <span id="date" style="display:inline; text-align: left;"></span>
+         Time: <span id="time" style="display:inline; text-align: middle;"></span>
+         Status: <span id="status" style="display:inline; text-align: right;">Start Your Engines</span>
+      </h3>
+   </div>
+
+   <div id="divButtonBar" style="margin:4px;">
+      <input type="button"
+             id = "btnStartOS"
+             name="brnStartOS"
+             class="normal_button"
+             value="Start"
+             tabindex="0"
+             onclick="TSOS.Control.hostBtnStartOS_click(this);">
+
+      <input type="button"
+             id = "btnHaltOS"
+             name="brnHaltOS"
+             class="normal_button"
+             disabled="disabled"
+             value="Halt"
+             tabindex="1"
+             onclick="TSOS.Control.hostBtnHaltOS_click(this);">
+
+      <input type="button"
+             id = "btnReset"
+             name="brnReset"
+             class="normal_button"
+             disabled="disabled"
+             value="Reset"
+             tabindex="2"
+             onclick="TSOS.Control.hostBtnReset_click(this);">
+      
+      <input type="button"
+             id = "btnEnableSingleStep"
+             name="btnEnableSingleStep"
+             class="normal_button"
+             disabled="disabled"
+             value="Single Step On"
+             tabindex="2"
+             onclick="TSOS.Control.hostBtnEnableSingleStep_click(this);">
+      
+      <input type="button"
+             id = "btnDisableSingleStep"
+             name="btnDisableSingleStep"
+             class="normal_button"
+             disabled="disabled"
+             value="Single Step Off"
+             tabindex="2"
+             onclick="TSOS.Control.hostBtnDisableSingleStep_click(this);">
+      
+      <input type="button"
+             id = "btnNextStep"
+             name="brnNextStep"
+             class="btn btn-default"
+             style="background-color:dimgrey; color:rgb(1, 195, 254);"
+             disabled="disabled"
+             value=">"
+             tabindex="2"
+             onclick="TSOS.Control.hostBtnNextStep_click(this);">
+   </div>
+
+   <div id="divConsole" style="margin:4px; width:500px; height:500px; float:left;">
+      <canvas id="display"
+              width="500px"
+              height="500px"
+              tabindex="3">
+      </canvas>
+   </div>
+
+   <div id="divLog" style="margin-left:520px;">
+      <label>
+         Host Log
+         <br>
+         <textarea name="taHostLog"
+                   id  ="taHostLog"
+                   rows="26"
+                   cols="48"
+         ></textarea>
+      </label>
+   </div>
+
+   <div id="divUserProgramInput" style="margin-left:520px;">
+      <label>
+         User Program Input
+         <br>
+         <textarea name="taProgramInput"
+                   id  ="taProgramInput"
+                   rows="8"
+                   cols="48"
+         >A9 00 8D 7B 00 A9 00 8D 7B 00 A9 00 8D 7C 00 A9 00 8D 7C 00 A9 01 8D 7A 00 A2 00 EC 7A 00 D0 39 A0 7D A2 02 FF AC 7B 00 A2 01 FF AD 7B 00 8D 7A 00 A9 01 6D 7A 00 8D 7B 00 A9 09 AE 7B 00 8D 7A 00 A9 00 EC 7A 00 D0 02 A9 01 8D 7A 00 A2 01 EC 7A 00 D0 05 A9 01 8D 7C 00 A9 00 AE 7C 00 8D 7A 00 A9 00 EC 7A 00 D0 02 A9 01 8D 7A 00 A2 00 EC 7A 00 D0 AC A0 7F A2 02 FF 00 00 00 00 63 00 63 64 6F 6E 65 00</textarea>
+      </label>
+   </div>
+</div>
+
+<div id="divMem" style="float:left; padding-right:5px;">
+   <label>
+      Memory
+      <br>
+      
+      <table id="tblMem" style="display:block; height:200px; overflow-y:scroll;"> 
+         <tbody>
+            <!-- Memory is generated from Control -->
+         </tbody>
+      </table>
+   </label>
+</div>
+
+<div id="divCPU" style="float: left; padding-right:5px; padding-bottom:17px;">
+   <label>
+      CPU
+      <br>
+      <table id="tblCPU">
+         <tbody>
+            <tr>
+               <th>PC</th>
+               <th>IR</th>
+               <th>ACC</th>
+               <th>Xreg</th>
+               <th>Yreg</th>
+               <th>Zflag</th>
+            </tr>
+            <tr>
+               <td id="cpuPC"></td>
+               <td id="cpuIR"></td>
+               <td id="cpuACC"></td>
+               <td id="cpuX"></td>
+               <td id="cpuY"></td>
+               <td id="cpuZ"></td>
+            </tr>
+         </tbody>
+      </table>
+   </label>
+</div>
+
+<div id="divPCB" style="float:left;">
+   <label>
+      PCB
+      <br>
+      <table id="tblPCB">
+         <tbody>
+            <tr>
+               <th>PID</th>
+               <th>PC</th>
+               <th>IR</th>
+               <th>ACC</th>
+               <th>Xreg</th>
+               <th>Yreg</th>
+               <th>Zflag</th>
+               <th>Priority</th>
+               <th>State</th>
+               <th>Location</th>
+            </tr>
+            <tr>
+               <td id="pcbPID"></td>
+               <td id="pcbPC"></td>
+               <td id="pcbIR"></td>
+               <td id="pcbACC"></td>
+               <td id="pcbX"></td>
+               <td id="pcbY"></td>
+               <td id="pcbZ"></td>
+               <td id="pcbPRI"></td>
+               <td id="pcbSTA"></td>
+               <td id="pcbLOC"></td>
+            </tr>
+         </tbody>
+      </table>
+   </label>
+</div>
+
+<p class="footerText" style="clear:both;">
+   <br>
+   Copyright &copy; 2008 - 2019 No Rights Reserved.
+   <br>
+   Reproduction is inhibited without the express written consent of
+   Ted Codd, Stevie Ray Vaughan, and Ian Fleming.
+</p>
+
+</body>
+</html>
