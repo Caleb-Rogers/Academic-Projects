@@ -1,6 +1,6 @@
 # C. Rogers academic work from Marist College
 
-## Order of undergrad courses
+## Order of related undergrad courses
 
 - [Introduction to Programming](https://www.coursicle.com/marist/courses/CMPT/120L/)
 - [Software Development I](https://www.coursicle.com/marist/courses/CMPT/220L/)
@@ -21,7 +21,7 @@
 - [Computer Graphics](https://www.coursicle.com/marist/courses/CMPT/446N/)
 - [B.S. Capping](https://www.coursicle.com/marist/courses/CMPT/475N/)
 
-## Order of graduate courses
+## Order of related graduate courses
 
 - [Software Design & Development](https://www.coursicle.com/marist/courses/MSCS/510L/)
 - [Networking](https://www.coursicle.com/marist/courses/MSCS/560L/)
